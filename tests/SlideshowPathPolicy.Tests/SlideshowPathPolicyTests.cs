@@ -1,3 +1,4 @@
+using Xunit;
 using YourNamespace;
 
 namespace SlideshowPathPolicy.Tests;
