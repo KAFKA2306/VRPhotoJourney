@@ -1,5 +1,4 @@
 using Xunit;
-using YourNamespace;
 
 namespace SlideshowPathPolicy.Tests;
 
@@ -16,7 +15,7 @@ public sealed class SlideshowPathPolicyTests : IDisposable
         File.WriteAllText(Path.Combine(directory, "a.jpg"), "x");
         File.WriteAllText(Path.Combine(directory, "ignored.txt"), "x");
 
-        string[] result = SlideshowPathPolicy.EnumerateImages(directory);
+        string[] result = global::YourNamespace.SlideshowPathPolicy.EnumerateImages(directory);
 
         Assert.Equal(new[] { "a.jpg", "b.PNG" }, result.Select(Path.GetFileName));
     }
@@ -25,7 +24,7 @@ public sealed class SlideshowPathPolicyTests : IDisposable
     public void EnumerateImagesRejectsMissingDirectory()
     {
         Assert.Throws<DirectoryNotFoundException>(() =>
-            SlideshowPathPolicy.EnumerateImages(Path.Combine(directory, "missing")));
+            global::YourNamespace.SlideshowPathPolicy.EnumerateImages(Path.Combine(directory, "missing")));
     }
 
     [Theory]
@@ -35,7 +34,7 @@ public sealed class SlideshowPathPolicyTests : IDisposable
     [InlineData(0, 1, 0, -1)]
     public void WrapIndexHandlesBoundaries(int current, int delta, int count, int expected)
     {
-        Assert.Equal(expected, SlideshowPathPolicy.WrapIndex(current, delta, count));
+        Assert.Equal(expected, global::YourNamespace.SlideshowPathPolicy.WrapIndex(current, delta, count));
     }
 
     public void Dispose() => Directory.Delete(directory, true);
