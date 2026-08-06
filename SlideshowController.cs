@@ -1,8 +1,6 @@
+using System;
+using System.IO;
 using UnityEngine;
-using VRC.SDK3.Components;
-using VRC.SDK3.Components.Video;
-using VRC.SDKBase;
-using VRC.Udon;
 using UnityEngine.UI;
 
 namespace YourNamespace
@@ -12,7 +10,8 @@ namespace YourNamespace
         public string folderPath = "Assets/Slideshow/Photos";
         public GameObject photoFramePrefab;
         public Transform slideshowParent;
-        public VRCUrlInputField folderInputField;
+        public InputField folderInputField;
+        public Text statusText;
 
         public Button enlargeButton;
         public Button overviewButton;
@@ -20,83 +19,129 @@ namespace YourNamespace
         public Button prevButton;
         public Button folderSelectButton;
 
-        private GameObject[] photoFrames;
-        private int currentIndex = 0;
+        private GameObject[] photoFrames = Array.Empty<GameObject>();
+        private int currentIndex = -1;
 
         private void Start()
         {
-            // ボタンのイベントリスナーを設定
-            enlargeButton.onClick.AddListener(EnlargeCurrentSlideshow);
-            overviewButton.onClick.AddListener(ShowOverview);
-            nextButton.onClick.AddListener(ShowNextSlideshow);
-            prevButton.onClick.AddListener(ShowPreviousSlideshow);
-            folderSelectButton.onClick.AddListener(SetFolderPath);
+            if (enlargeButton != null) enlargeButton.onClick.AddListener(EnlargeCurrentSlideshow);
+            if (overviewButton != null) overviewButton.onClick.AddListener(ShowOverview);
+            if (nextButton != null) nextButton.onClick.AddListener(ShowNextSlideshow);
+            if (prevButton != null) prevButton.onClick.AddListener(ShowPreviousSlideshow);
+            if (folderSelectButton != null) folderSelectButton.onClick.AddListener(SetFolderPath);
 
-            // 初期スライドショーを生成
             GenerateSlideshow();
         }
 
-        private void GenerateSlideshow()
+        public void GenerateSlideshow()
         {
-            // 既存のフォトフレームを削除
-            foreach (Transform child in slideshowParent)
+            ClearFrames();
+
+            string[] photoPaths;
+            try
             {
-                Destroy(child.gameObject);
+                photoPaths = SlideshowPathPolicy.EnumerateImages(folderPath);
+            }
+            catch (Exception exception) when (exception is ArgumentException || exception is DirectoryNotFoundException || exception is IOException)
+            {
+                SetEmptyState(exception.Message);
+                Debug.LogWarning(exception.Message);
+                return;
             }
 
-            // 新しいフォトフレームを生成
-            string[] photoPaths = System.IO.Directory.GetFiles(folderPath);
-            photoFrames = new GameObject[photoPaths.Length];
+            if (photoPaths.Length == 0)
+            {
+                SetEmptyState("No supported images were found. Supported formats: .jpg, .jpeg, .png");
+                return;
+            }
 
+            photoFrames = new GameObject[photoPaths.Length];
             for (int i = 0; i < photoPaths.Length; i++)
             {
                 GameObject photoFrame = Instantiate(photoFramePrefab, slideshowParent);
-                // フォトフレームの設定を行う（例：テクスチャの割り当てなど）
+                photoFrame.name = Path.GetFileNameWithoutExtension(photoPaths[i]);
+                photoFrame.SetActive(false);
                 photoFrames[i] = photoFrame;
             }
 
-            // 最初のスライドショーを表示
+            SetNavigationEnabled(true);
+            SetStatus($"Loaded {photoFrames.Length} image(s).");
             ShowSlideshow(0);
         }
 
-        private void ShowSlideshow(int index)
+        public void ShowSlideshow(int index)
         {
-            // 現在のフォトフレームを非アクティブ化
-            if (currentIndex >= 0 && currentIndex < photoFrames.Length)
+            if (!SlideshowPathPolicy.IsValidIndex(index, photoFrames.Length))
+            {
+                return;
+            }
+
+            if (SlideshowPathPolicy.IsValidIndex(currentIndex, photoFrames.Length))
             {
                 photoFrames[currentIndex].SetActive(false);
             }
 
-            // 指定されたインデックスのフォトフレームをアクティブ化
             currentIndex = index;
             photoFrames[currentIndex].SetActive(true);
         }
 
-        private void EnlargeCurrentSlideshow()
+        private void ClearFrames()
         {
-            // 現在のスライドショーを拡大表示する処理を実装
+            if (slideshowParent != null)
+            {
+                foreach (Transform child in slideshowParent)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            photoFrames = Array.Empty<GameObject>();
+            currentIndex = -1;
         }
 
-        private void ShowOverview()
+        private void SetEmptyState(string message)
         {
-            // スライドショーの一覧を表示する処理を実装
+            SetNavigationEnabled(false);
+            SetStatus(message);
         }
 
-        private void ShowNextSlideshow()
+        private void SetNavigationEnabled(bool enabled)
         {
-            int nextIndex = (currentIndex + 1) % photoFrames.Length;
+            if (nextButton != null) nextButton.interactable = enabled;
+            if (prevButton != null) prevButton.interactable = enabled;
+            if (enlargeButton != null) enlargeButton.interactable = enabled;
+            if (overviewButton != null) overviewButton.interactable = enabled;
+        }
+
+        private void SetStatus(string message)
+        {
+            if (statusText != null) statusText.text = message;
+        }
+
+        private void EnlargeCurrentSlideshow() { }
+        private void ShowOverview() { }
+
+        public void ShowNextSlideshow()
+        {
+            int nextIndex = SlideshowPathPolicy.WrapIndex(currentIndex, 1, photoFrames.Length);
             ShowSlideshow(nextIndex);
         }
 
-        private void ShowPreviousSlideshow()
+        public void ShowPreviousSlideshow()
         {
-            int prevIndex = (currentIndex - 1 + photoFrames.Length) % photoFrames.Length;
-            ShowSlideshow(prevIndex);
+            int previousIndex = SlideshowPathPolicy.WrapIndex(currentIndex, -1, photoFrames.Length);
+            ShowSlideshow(previousIndex);
         }
 
-        private void SetFolderPath()
+        public void SetFolderPath()
         {
-            folderPath = folderInputField.GetUrl().Get();
+            if (folderInputField == null)
+            {
+                SetEmptyState("Local folder input is not configured.");
+                return;
+            }
+
+            folderPath = folderInputField.text;
             GenerateSlideshow();
         }
     }
