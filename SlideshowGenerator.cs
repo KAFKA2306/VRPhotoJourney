@@ -7,6 +7,8 @@ namespace YourNamespace
     public class SlideshowGenerator : EditorWindow
     {
         private string folderPath = "Assets/Slideshow/Photos";
+        private string exhibitionManifestPath = "Assets/Exhibition/exhibition.json";
+        private string exhibitionOutputPath = "Assets/Exhibition/Generated";
         private GameObject slideshowPrefab;
         private GameObject photoFramePrefab;
 
@@ -21,6 +23,34 @@ namespace YourNamespace
             photoFramePrefab = EditorGUILayout.ObjectField("Photo Frame Prefab", photoFramePrefab, typeof(GameObject), false) as GameObject;
 
             if (GUILayout.Button("Generate Slideshow")) GenerateSlideshow();
+
+            EditorGUILayout.Space();
+            GUILayout.Label("Build-time Exhibition Pack", EditorStyles.boldLabel);
+            exhibitionManifestPath = EditorGUILayout.TextField("Manifest Asset Path", exhibitionManifestPath);
+            exhibitionOutputPath = EditorGUILayout.TextField("Output Asset Directory", exhibitionOutputPath);
+            EditorGUILayout.HelpBox(
+                "Generates fixed Unity assets from an explicit manifest. It does not enumerate an end user's PC at VRChat runtime.",
+                MessageType.Info);
+            if (GUILayout.Button("Generate Exhibition Pack")) GenerateExhibitionPack();
+        }
+
+        private void GenerateExhibitionPack()
+        {
+            if (photoFramePrefab == null)
+            {
+                Debug.LogError("Photo Frame Prefab is not assigned.");
+                return;
+            }
+
+            try
+            {
+                bool generated = ExhibitionPackGenerator.Generate(exhibitionManifestPath, exhibitionOutputPath, photoFramePrefab);
+                if (generated) Debug.Log("Exhibition Pack generated. Review exhibition-report.json/.md before delivery.");
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogError($"Exhibition Pack generation failed: {exception.Message}");
+            }
         }
 
         private void GenerateSlideshow()
