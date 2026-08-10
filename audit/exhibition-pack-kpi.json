@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "issue": 3,
+  "status": "NOT_STARTED",
+  "measurement_window_days": 60,
+  "metrics": {
+    "sample_exhibition_opened": 0,
+    "direct_proposals": 0,
+    "qualified_inquiry": 0,
+    "customer_demo_completed": 0,
+    "paid_pilot": 0,
+    "repeat_exhibition_requested": 0
+  },
+  "targets": {
+    "sample_exhibition_opened": 150,
+    "direct_proposals": 10,
+    "qualified_inquiry": 3,
+    "customer_demo_completed": 2,
+    "paid_pilot": 1,
+    "repeat_exhibition_requested": 1
+  },
+  "evidence": []
+}

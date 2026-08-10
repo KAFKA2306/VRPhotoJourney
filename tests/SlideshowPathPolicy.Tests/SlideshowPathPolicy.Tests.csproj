@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../SlideshowPathPolicy.cs" Link="SlideshowPathPolicy.cs" />
+    <Compile Include="../../ExhibitionManifestPolicy.cs" Link="ExhibitionManifestPolicy.cs" />
   </ItemGroup>
 </Project>

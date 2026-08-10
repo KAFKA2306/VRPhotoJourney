@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "exhibitionId": "sample-exhibition",
+  "title": "Sample Exhibition",
+  "organizer": "Sample Organizer",
+  "sourceFolder": "Assets/SampleExhibition/Photos",
+  "rightsStatus": "SAMPLE_LICENSED",
+  "photos": [
+    {
+      "id": "photo-001",
+      "file": "01.jpg",
+      "order": 10,
+      "title": "Sample Photo 1",
+      "caption": "Replace this file only with a redistribution-permitted sample image.",
+      "author": "Sample Author"
+    },
+    {
+      "id": "photo-002",
+      "file": "02.png",
+      "order": 20,
+      "title": "Sample Photo 2",
+      "caption": "The repository does not include customer photos.",
+      "author": "Sample Author"
+    }
+  ]
+}
