@@ -1,5 +1,7 @@
 # VRPhotoJourney
 
+[![Test](https://github.com/KAFKA2306/VRPhotoJourney/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/VRPhotoJourney/actions/workflows/test.yml)
+
 Unity Editor上で、指定したローカルフォルダの画像からスライドショー用オブジェクトを生成する試作です。
 
 ## 現在の保証範囲
