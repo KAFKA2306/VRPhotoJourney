@@ -8,11 +8,17 @@ permissions:
   contents: read
 
 jobs:
-  slideshow-policy:
+  exhibition-policy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - run: dotnet test tests/SlideshowPathPolicy.Tests/SlideshowPathPolicy.Tests.csproj --configuration Release
+      - name: Reject retired runtime slideshow path
+        run: |
+          test ! -e SlideshowController.cs
+          test ! -e SlideshowPathPolicy.cs
+          test ! -e Slideshow.prefab
+          test ! -d tests/SlideshowPathPolicy.Tests
+      - run: dotnet test tests/ExhibitionManifestPolicy.Tests/ExhibitionManifestPolicy.Tests.csproj --configuration Release
