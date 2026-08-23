@@ -16,3 +16,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: dotnet test tests/SlideshowPathPolicy.Tests/SlideshowPathPolicy.Tests.csproj --configuration Release
+      - name: Reject retired slideshow prefab contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -q 'slideshowPrefab' SlideshowGenerator.cs
+          test ! -e Slideshow.prefab
+          test ! -e Slideshow.prefab.meta

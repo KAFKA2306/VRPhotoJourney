@@ -9,7 +9,6 @@ namespace YourNamespace
         private string folderPath = "Assets/Slideshow/Photos";
         private string exhibitionManifestPath = "Assets/Exhibition/exhibition.json";
         private string exhibitionOutputPath = "Assets/Exhibition/Generated";
-        private GameObject slideshowPrefab;
         private GameObject photoFramePrefab;
 
         [MenuItem("Tools/Slideshow Generator")]
@@ -19,7 +18,6 @@ namespace YourNamespace
         {
             GUILayout.Label("Slideshow Generator", EditorStyles.boldLabel);
             folderPath = EditorGUILayout.TextField("Photo Folder Path", folderPath);
-            slideshowPrefab = EditorGUILayout.ObjectField("Slideshow Prefab", slideshowPrefab, typeof(GameObject), false) as GameObject;
             photoFramePrefab = EditorGUILayout.ObjectField("Photo Frame Prefab", photoFramePrefab, typeof(GameObject), false) as GameObject;
 
             if (GUILayout.Button("Generate Slideshow")) GenerateSlideshow();
@@ -55,9 +53,9 @@ namespace YourNamespace
 
         private void GenerateSlideshow()
         {
-            if (slideshowPrefab == null || photoFramePrefab == null)
+            if (photoFramePrefab == null)
             {
-                Debug.LogError("Slideshow Prefab or Photo Frame Prefab is not assigned.");
+                Debug.LogError("Photo Frame Prefab is not assigned.");
                 return;
             }
 
